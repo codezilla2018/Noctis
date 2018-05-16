@@ -5,6 +5,9 @@
  */
 package noctis.view;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  *
  * @author Jinadi
@@ -125,7 +128,7 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-      getText();
+        getText();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -179,7 +182,10 @@ public class MainFrame extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void getText() {
-       String txt= txArea.getText();
-        boolean r= txt.matches("[a-z0-9-]{1,30}@[a-z0-9-]{1,65}.[a-z]{1,}");
+        String txt = txArea.getText();
+        Matcher m = Pattern.compile("[a-z0-9-]{1,30}@[a-z0-9-]{1,65}.[a-z]{1,}").matcher(txt);
+        while (m.find()) {
+            System.out.println(m.group());
+        }
     }
 }
