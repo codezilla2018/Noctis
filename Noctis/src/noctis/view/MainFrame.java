@@ -5,6 +5,8 @@
  */
 package noctis.view;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +19,8 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * Creates new form MainFrame
      */
+    Queue<String> list = new LinkedList<>();
+
     public MainFrame() {
         initComponents();
         setLocationRelativeTo(null);
@@ -41,7 +45,7 @@ public class MainFrame extends javax.swing.JFrame {
         txArea = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
+        txtA2 = new javax.swing.JTextArea();
         jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -101,9 +105,10 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(29, 53, 730, 340));
 
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
-        jScrollPane2.setViewportView(jTextArea2);
+        txtA2.setEditable(false);
+        txtA2.setColumns(20);
+        txtA2.setRows(5);
+        jScrollPane2.setViewportView(txtA2);
 
         jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 430, 730, 160));
 
@@ -177,15 +182,20 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea jTextArea2;
     private javax.swing.JTextArea txArea;
+    private javax.swing.JTextArea txtA2;
     // End of variables declaration//GEN-END:variables
 
     private void getText() {
         String txt = txArea.getText();
         Matcher m = Pattern.compile("[a-z0-9-]{1,30}@[a-z0-9-]{1,65}.[a-z]{1,}").matcher(txt);
         while (m.find()) {
-            System.out.println(m.group());
+            list.add(m.group());
         }
+        String x="";
+        for (String string : list) {
+            x=x+string+"\n";
+        }
+        txtA2.setText(x);
     }
 }
