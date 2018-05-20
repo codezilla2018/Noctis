@@ -10,10 +10,15 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.customsearch.Customsearch;
 import com.google.api.services.customsearch.CustomsearchRequestInitializer;
 import com.google.api.services.customsearch.model.Search;
+import com.sun.org.apache.xml.internal.dtm.DTM;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
+import noctis.models.LinkM;
+import sun.misc.Queue;
 
 /**
  *
@@ -24,8 +29,13 @@ public class WebUI extends javax.swing.JFrame {
     /**
      * Creates new form WebUI
      */
+    LinkedList<LinkM> que = new LinkedList<>();
+    DefaultListModel dlm;
+
     public WebUI() {
         initComponents();
+        dlm = new DefaultListModel();
+
     }
 
     /**
@@ -47,7 +57,7 @@ public class WebUI extends javax.swing.JFrame {
         jTextArea1 = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        txtLink = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
 
@@ -77,10 +87,10 @@ public class WebUI extends javax.swing.JFrame {
         jPanel1.add(txtWeb, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 80, 410, 40));
 
         listWeb.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        listWeb.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        listWeb.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                listWebValueChanged(evt);
+            }
         });
         jScrollPane1.setViewportView(listWeb);
 
@@ -99,7 +109,7 @@ public class WebUI extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel3.setText("Link");
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 100, 40));
-        jPanel1.add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 140, 410, 40));
+        jPanel1.add(txtLink, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 140, 410, 40));
 
         jButton1.setBackground(new java.awt.Color(102, 153, 255));
         jButton1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
@@ -140,7 +150,9 @@ public class WebUI extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
+
             String webSearch = txtWeb.getText();
+            dlm.removeAllElements();
             webSearch(webSearch);
         } catch (GeneralSecurityException ex) {
             Logger.getLogger(WebUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -148,6 +160,13 @@ public class WebUI extends javax.swing.JFrame {
             Logger.getLogger(WebUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void listWebValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listWebValueChanged
+        int x = listWeb.getSelectedIndex();
+        LinkM linkM = que.get(x);
+        txtLink.setText(linkM.getLink());
+
+    }//GEN-LAST:event_listWebValueChanged
 
     /**
      * @param args the command line arguments
@@ -195,8 +214,8 @@ public class WebUI extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField2;
     private javax.swing.JList<String> listWeb;
+    private javax.swing.JTextField txtLink;
     private javax.swing.JTextField txtWeb;
     // End of variables declaration//GEN-END:variables
 
@@ -218,10 +237,14 @@ public class WebUI extends javax.swing.JFrame {
         if (result.getItems() != null) {
             for (com.google.api.services.customsearch.model.Result ri : result.getItems()) {
                 //Get title, link, body etc. from search
-                System.out.println(ri.getTitle() + ", " + ri.getLink());
-                
+                LinkM lm = new LinkM(ri.getTitle(), ri.getLink());
+                que.addLast(lm);
 
             }
         }
+        for (LinkM linkM : que) {
+            dlm.addElement(linkM.getTitle());
+        }
+        listWeb.setModel(dlm);
     }
 }
