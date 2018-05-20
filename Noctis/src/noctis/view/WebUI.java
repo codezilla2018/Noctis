@@ -5,6 +5,16 @@
  */
 package noctis.view;
 
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.customsearch.Customsearch;
+import com.google.api.services.customsearch.CustomsearchRequestInitializer;
+import com.google.api.services.customsearch.model.Search;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Jinadi
@@ -30,9 +40,9 @@ public class WebUI extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        txtWeb = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        listWeb = new javax.swing.JList<>();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
@@ -63,16 +73,16 @@ public class WebUI extends javax.swing.JFrame {
         jLabel1.setText("Search Web");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 106, 60));
 
-        jTextField1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jPanel1.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 80, 410, 40));
+        txtWeb.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jPanel1.add(txtWeb, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 80, 410, 40));
 
-        jList1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
+        listWeb.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        listWeb.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane1.setViewportView(jList1);
+        jScrollPane1.setViewportView(listWeb);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 210, 470, 260));
 
@@ -95,6 +105,11 @@ public class WebUI extends javax.swing.JFrame {
         jButton1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButton1.setText("Search");
         jButton1.setOpaque(false);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 80, 100, 40));
 
         jButton2.setBackground(new java.awt.Color(102, 153, 255));
@@ -122,6 +137,17 @@ public class WebUI extends javax.swing.JFrame {
     private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
         this.dispose();
     }//GEN-LAST:event_jLabel9MouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        try {
+            String webSearch = txtWeb.getText();
+            webSearch(webSearch);
+        } catch (GeneralSecurityException ex) {
+            Logger.getLogger(WebUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(WebUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -165,12 +191,37 @@ public class WebUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
+    private javax.swing.JList<String> listWeb;
+    private javax.swing.JTextField txtWeb;
     // End of variables declaration//GEN-END:variables
+
+    private void webSearch(String webSearch) throws GeneralSecurityException, IOException {
+        String searchQuery = webSearch; //The query to search
+        String cx = "002845322276752338984:vxqzfa86nqc"; //Your search engine
+
+        //Instance Customsearch
+        Customsearch cs = new Customsearch.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), null)
+                .setApplicationName("Noctis")
+                .setGoogleClientRequestInitializer(new CustomsearchRequestInitializer("AIzaSyDRxS9LyEECj53Zimlwf-asD_GTfMSE-Rw"))
+                .build();
+
+        //Set search parameter
+        Customsearch.Cse.List list = cs.cse().list(searchQuery).setCx(cx);
+
+        //Execute search
+        Search result = list.execute();
+        if (result.getItems() != null) {
+            for (com.google.api.services.customsearch.model.Result ri : result.getItems()) {
+                //Get title, link, body etc. from search
+                System.out.println(ri.getTitle() + ", " + ri.getLink());
+                
+
+            }
+        }
+    }
 }
