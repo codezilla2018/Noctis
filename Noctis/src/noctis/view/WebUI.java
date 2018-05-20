@@ -5,6 +5,10 @@
  */
 package noctis.view;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.customsearch.Customsearch;
@@ -16,6 +20,8 @@ import java.security.GeneralSecurityException;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import noctis.models.LinkM;
 import sun.misc.Queue;
@@ -30,6 +36,7 @@ public class WebUI extends javax.swing.JFrame {
      * Creates new form WebUI
      */
     LinkedList<LinkM> que = new LinkedList<>();
+     java.util.Queue<String> list = new LinkedList<>();
     DefaultListModel dlm;
 
     public WebUI() {
@@ -126,6 +133,11 @@ public class WebUI extends javax.swing.JFrame {
         jButton2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButton2.setText("Extract");
         jButton2.setOpaque(false);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 140, 100, 40));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -167,6 +179,10 @@ public class WebUI extends javax.swing.JFrame {
         txtLink.setText(linkM.getLink());
 
     }//GEN-LAST:event_listWebValueChanged
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+       ext();
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -246,5 +262,29 @@ public class WebUI extends javax.swing.JFrame {
             dlm.addElement(linkM.getTitle());
         }
         listWeb.setModel(dlm);
+    }
+
+    private void ext() {
+        try {
+            WebClient webClient=new WebClient(BrowserVersion.BEST_SUPPORTED);
+            webClient.getOptions().setJavaScriptEnabled(true);
+            HtmlPage htmlPage=webClient.getPage(txtLink.getText());
+            String pageC=htmlPage.asText();
+           // System.out.println(pageC);
+             
+        Matcher m = Pattern.compile("[a-z0-9-]{1,30}@[a-z0-9-]{1,65}.[a-z]{1,}").matcher(pageC);
+        while (m.find()) {
+            list.add(m.group());
+        }
+        String x="";
+        for (String string : list) {
+            x=x+string+"\n";
+        }
+        jTextArea1.setText(x);
+        } catch (IOException ex) {
+            Logger.getLogger(WebUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FailingHttpStatusCodeException ex) {
+            Logger.getLogger(WebUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
