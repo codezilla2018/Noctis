@@ -268,11 +268,12 @@ public class WebUI extends javax.swing.JFrame {
 
     private void ext() {
         try {
-            WebClient webClient=new WebClient(BrowserVersion.BEST_SUPPORTED);
+            WebClient webClient=new WebClient(BrowserVersion.CHROME);
             webClient.getOptions().setJavaScriptEnabled(true);
             HtmlPage htmlPage=webClient.getPage(txtLink.getText());
             String pageC=htmlPage.asText();
-           // System.out.println(pageC);
+            webClient.close();
+            System.out.println(pageC);
              
         Matcher m = Pattern.compile("[a-z0-9-]{1,30}@[a-z0-9-]{1,65}.[a-z]{1,}").matcher(pageC);
         while (m.find()) {
